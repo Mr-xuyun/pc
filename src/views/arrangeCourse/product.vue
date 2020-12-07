@@ -7,7 +7,6 @@
         <a-icon type="plus-circle" />
         新增产品
       </a-button>
-      
     </div>
     <!--  表格的内容 -->
     <a-spin :spinning="spinning">
@@ -90,6 +89,20 @@
                 <a-select-option :value="'次'"> 次</a-select-option>
                 <a-select-option :value="'月'"> 月</a-select-option>
               </a-select>
+            </td>
+          </tr>
+          <tr v-if="unit=='月'">
+            <td>
+              <img src="../../assets/星号.png" width="10" height="10" />
+              <span style="margin-left: 5px">折算率 :</span>
+            </td>
+            <td>
+              <a-input-number
+                placeholder="请输入折算率"
+                style="width: 160px; margin-left: 15px"
+                v-model="conversionRate"
+                :parser="(value) => value.replace(/\¥\s?|(,*)/g, '')"
+              />
             </td>
           </tr>
         </table>
@@ -208,6 +221,7 @@ export default {
           reduce: '', //生成优惠价格
         },
       ],
+      conversionRate:0,//折算率
       pageNo: 1,
       total: 0,
       spinning: false,
@@ -263,8 +277,9 @@ export default {
       this.id = type == 'add' ? '' : obj.id
       this.product = type == 'add' ? '' : obj.productName
       this.price = type == 'add' ? '' : obj.price
+      this.conversionRate = type == 'add' ? '' : obj.conversionRate
       this.unit = type == 'add' ? '次' : obj.unit
-      this.classTime = type == 'add' ? '次' : obj.semester.split(',')
+      this.classTime = type == 'add' ? [] : obj.semester.split(',')
       this.discountsList = type == 'add' ? [] : JSON.parse(obj.reducePrice)
       // 禁用弹出框的内容
       this.showdetails = type != 'add'
@@ -316,6 +331,7 @@ export default {
         semester: this.classTime.join(','),
         price: this.price,
         unit: this.unit,
+        conversionRate: this.conversionRate,
         reducePrice: JSON.stringify(this.discountsList),
       }
       if (this.id != '' && this.statusBtn == 'update') {
