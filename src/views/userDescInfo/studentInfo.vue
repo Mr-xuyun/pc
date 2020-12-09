@@ -23,6 +23,9 @@
         <span slot="action" slot-scope="text, record">
           <div style="display: flex">
             <a-divider type="vertical" />
+            <a-button v-if="record.isSleep" type="primary" size="small" @click="sleep(record,0)"> <a-icon type="clock-circle" /> 取消休眠 </a-button>
+            <a-button  v-else type="danger" size="small" @click="sleep(record,1)"> <a-icon type="clock-circle" /> 休眠 </a-button>
+            <a-divider type="vertical" />
             <a-button type="primary" size="small" @click="update(record)"> <a-icon type="edit" /> 修改 </a-button>
             <a-divider type="vertical" />
             <a-button type="danger" size="small" @click="deleteItem(record)"> <a-icon type="delete" /> 删除 </a-button>
@@ -63,15 +66,16 @@
             style="width: 80%; margin-left: 29px"
             @change="changeStudentName"
             :disabled="showdetails"
+            :labelInValue="true"
             placeholder="请输入学生"
           >
-            <a-select-option v-for="item in studentList" :key="item.value" :value="JSON.stringify(item)">
+            <a-select-option v-for="item in studentList" :key="item.value" :value="item.value">
               {{ item.label }}
             </a-select-option>
           </a-select>
         </div>
       </div>
-      <!-- 学期段 -->
+      &lt;!&ndash; 学期段 &ndash;&gt;
       <div style="margin: 15px">
         <div class="flex_center">
           <img src="../../assets/星号.png" width="10" height="10" />
@@ -86,7 +90,7 @@
           </a-select>
         </div>
       </div>
-      <!-- 类别 -->
+      &lt;!&ndash; 类别 &ndash;&gt;
       <div style="margin: 15px">
         <div class="flex_center">
           <img src="../../assets/星号.png" width="10" height="10" />
@@ -101,7 +105,7 @@
           </a-select>
         </div>
       </div>
-      <!-- 来源 -->
+      &lt;!&ndash; 来源 &ndash;&gt;
       <div style="margin: 15px">
         <div class="flex_center">
           <img src="../../assets/星号.png" width="10" height="10" />
@@ -116,7 +120,7 @@
           </a-select>
         </div>
       </div>
-      <!-- 学校名称 -->
+      &lt;!&ndash; 学校名称 &ndash;&gt;
       <div style="margin: 15px">
         <div class="flex_center">
           <img src="../../assets/星号.png" width="10" height="10" />
@@ -150,7 +154,7 @@
       </div>
       <div v-if="situationMarkList.length > 0">
         <div v-for="(mark, i) of situationMarkList" :key="i">
-          <!--分数情况 -->
+          &lt;!&ndash;分数情况 &ndash;&gt;
           <div style="margin: 15px">
             <div class="flex_center">
               <a-tag color="#1B8FFF">
@@ -177,7 +181,7 @@
         </div>
       </div>
 
-      <!-- 学生特点  -->
+      &lt;!&ndash; 学生特点  &ndash;&gt;
       <div style="margin: 15px">
         <div class="flex_center">
           <img src="../../assets/星号.png" width="10" height="10" />
@@ -185,7 +189,7 @@
           <a-input :disabled="showdetails" style="width: 75%; margin-left: 15px" v-model="StudentTrait"></a-input>
         </div>
       </div>
-      <!-- 家长要求:  -->
+      &lt;!&ndash; 家长要求:  &ndash;&gt;
       <div style="margin: 15px">
         <div class="flex_center">
           <img src="../../assets/星号.png" width="10" height="10" />
@@ -193,7 +197,7 @@
           <a-input style="width: 75%; margin-left: 19px" v-model="patriarchRequire" :disabled="showdetails"></a-input>
         </div>
       </div>
-      <!-- 对老师要求::  -->
+      &lt;!&ndash; 对老师要求::  &ndash;&gt;
       <div style="margin: 15px">
         <div class="flex_center">
           <img src="../../assets/星号.png" width="10" height="10" />
@@ -201,7 +205,7 @@
           <a-input :disabled="showdetails" style="width: 75%; margin-left: 5px" v-model="teacherRequire"></a-input>
         </div>
       </div>
-      <!-- 规划师要求:  -->
+      &lt;!&ndash; 规划师要求:  &ndash;&gt;
       <div style="margin: 15px">
         <div class="flex_center">
           <img src="../../assets/星号.png" width="10" height="10" />
@@ -213,6 +217,20 @@
         <a-button type="primary" @click="submit"> 确定</a-button>
       </div>
     </a-drawer>
+
+    <!-- 休眠弹出框 -->
+    <a-modal
+      :closable="true"
+      @cancel="showModal = false"
+      @ok="submitSleep"
+      v-model="showModal"
+      title="休眠"
+      ok-text="确认"
+      cancel-text="取消">
+      <label>休眠天数</label>
+      <a-input-number style="width: 70%" v-model="sleepDays" :min="14" :default-value="3" ></a-input-number>
+    </a-modal>
+
   </div>
 </template>
 <script>
@@ -287,7 +305,10 @@ export default {
       pageNo: 1,
       total: 100,
       spinning: false, //加载的状态图标
-      pageSize:10
+      pageSize:10,
+      showModal:false,
+      sleepDays:14,
+      sleepId : "",
     }
   },
 
@@ -301,12 +322,46 @@ export default {
   methods: {
      // 页码数量
     changePageSize(current, size){
-           this.pageSize =size
-          this.reloadAll(current)
+      this.pageSize =size
+      this.reloadAll(current)
+    },
+    sleep(obj,status){
+      if (status==1){
+        this.showModal = true;
+        this.sleepId = obj.id;
+      }else{
+        let $this = this;
+        $this.$confirm({
+          title: '确认取消休眠?',
+          onOk() {
+            $this.updateSleep(obj.id,false);
+          },
+        })
+      }
+    },
+    submitSleep(){
+      this.updateSleep(this.sleepId,true, this.sleepDays);
+      this.showModal = false;
+    },
+    updateSleep(id,isSleep,sleepDays){
+      let data = {
+        id: id,
+        isSleep: isSleep
+      }
+      if (isSleep){
+        data.sleepDays = sleepDays;
+      }
+      this.axios.post('pc/studentInfo/updateSleep', data).then((res) => {
+        if (res.success && res.result) {
+          this.$message.info(res.message)
+          this.reloadAll(1)
+        } else {
+          this.$message.error('操作失败')
+        }
+      })
     },
     //修改
     update(obj) {
-      console.log(obj.name);
       this.statusBtn = 'update'
       this.showDrawer = true
       this.id = obj.id
@@ -346,10 +401,10 @@ export default {
     // 查看消费情况
     consume() {},
     // 基本信息的选择器
-    changeStudentName(obj) {
-       let obj1= JSON.parse(obj)
-      this.studentName = obj1.label
-      this.studentId = obj1.value
+    changeStudentName(o) {
+      let obj = JSON.parse(o);
+      this.studentName = obj.label
+      this.studentId = obj.value
     },
     changeSubject(obj) {
       let data = {
@@ -464,12 +519,11 @@ export default {
       }
       this.spinning = true
       this.axios.post('pc/studentInfo/studentInfoList', data).then((res) => {
-        console.log(res);
         if (res.success) {
            if (res.result.records.length != 0) {
             this.data = res.result.records
             this.total = res.result.total
-           } 
+           }
         } else {
               this.data = res.result.records
         }
@@ -478,7 +532,6 @@ export default {
     },
     loadAddInfo() {
       this.axios.post('pc/studentInfo/queryStudentNotWriteInfo').then((res) => {
-        console.log(res);
         let result = res.result
         this.studentList = []
         for (let item of result) {
@@ -516,8 +569,7 @@ export default {
     },
   },
   mounted() {
-    this.reloadAll(1);
-
+    this.reloadAll(1)
   },
 }
 </script>
@@ -542,6 +594,9 @@ export default {
 ::v-deep .ant-pagination {
   text-align: right;
   margin-top: 10px;
+}
+label{
+  margin: 15px;
 }
 </style>
 <style>

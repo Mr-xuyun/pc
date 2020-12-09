@@ -37,7 +37,7 @@
       @change="reloadAll"
     />
       </div>
-   
+
   </div>
 </template>
 <script>
@@ -93,7 +93,6 @@ export default {
       pageNo: 1,
       total:1,
       spinning :false,
-      pageNo :1
     }
   },
   methods: {
@@ -124,11 +123,10 @@ export default {
       let data = {
         pageNo:  this.pageNo,
         pageSize: this.pageSize,
-        status: 1,
+        status: 2,
       }
-        this.spinning= true
+      this.spinning= true
       this.axios.post('pc/coursePlan/listByPage', data).then((res) => {
-         console.log(res);
         if (res.success) {
           for (let item of res.result.records) {
             item.createTime = moment(item.createTime).format('YYYY/MM/DD HH:mm')

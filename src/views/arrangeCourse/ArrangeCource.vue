@@ -2,7 +2,10 @@
   <div class="cark1">
     <!--  表格的内容 -->
     <div style="display: flex; justify-content: space-between; margin: 15px 0px">
-      <a-button type="primary" @click="loadInfo">突发排课</a-button>
+      <div>
+        <a-button type="primary" @click="loadInfo">突发排课</a-button>
+        <a-button type="primary" style="margin-left: 15px" @click="$router.push('/arrangeCourse/courseCommit')">批量通知</a-button>
+      </div>
       <a-drawer
         title="突发排课"
         placement="right"
@@ -87,7 +90,13 @@
       <a-table :columns="columns" :data-source="data" rowKey="id" bordered :pagination="false">
         <!-- 上课的时间 -->
         <a slot="classTime" slot-scope="classTime, record">
-          <span style="color: #999"> {{ record.courseDate }}</span>
+          <a-date-picker
+            :disabled="record.disabled"
+            v-model="record.courseDate"
+            format="YYYY-MM-DD"
+          >
+
+          </a-date-picker>
           <a-time-picker
             style="width: 80px; margin-left: 8px"
             :disabled="record.disabled"
@@ -107,9 +116,7 @@
         <!-- 操作按钮 -->
         <a slot="action" slot-scope="action, record">
           <div style="display: flex">
-            <a-popconfirm title="确定发布吗?" ok-text="是" cancel-text="否" @confirm="issueOk(record)">
-              <a-button type="primary" class="btn"><a-icon type="export" />发布</a-button>
-            </a-popconfirm>
+            <a-button type="primary"  @click="issueOk(record)" class="btn"><a-icon type="export" />检查</a-button>
             <a-button @click="record.disabled = false" class="btn"> <a-icon type="edit" />修改</a-button>
             <a-button
               @click="save(record)"
@@ -117,12 +124,28 @@
             >
               <a-icon type="file" />保存
             </a-button>
-            <!--<a-popconfirm title="确定删除吗?" ok-text="是" cancel-text="否" @confirm="remove(record)">
-            <a-button type="danger" class="btn"> <a-icon type="close" />删除</a-button>
-          </a-popconfirm>-->
+            <a-button type="primary" @click="id=record.id;courseDate=record.courseDate;showModal=true" class="btn"> <a-icon type="file" />请假说明</a-button>
           </div>
         </a>
       </a-table>
+      <!-- 请假说明 -->
+      <a-modal
+        :closable="true"
+        @cancel="showModal = false"
+        @ok="ok"
+        v-model="showModal"
+        title="请假"
+        ok-text="确认"
+        cancel-text="取消">
+        <div style="margin-bottom: 15px">情况说明:</div>
+        <a-textarea style="margin-bottom: 15px" v-model="situation" placeholder="请输入情况说明" :rows="4" />
+        <div style="margin-bottom: 15px">上课日期:</div>
+        <a-date-picker
+          v-model="courseDate"
+          format="YYYY-MM-DD"
+        >
+        </a-date-picker>
+      </a-modal>
     </a-spin>
     <a-pagination
       :default-current="1"
@@ -169,7 +192,7 @@ export default {
         },
         {
           title: '上课时间',
-          width: '350px',
+          width: '500px',
           scopedSlots: { customRender: 'classTime' },
           dataIndex: 'courseDate',
         },
@@ -204,6 +227,7 @@ export default {
       ],
       data: [],
       // 突发排课
+      id:"",
       visible: false, //突发弹出框
       newBirth: false, //滑块是否是新生
       student: undefined, //学生
@@ -213,6 +237,9 @@ export default {
       startTime: undefined, //开始时间
       endTime: undefined, //结束时间
       conflictShow: false, //冲突的按钮
+      showModal:false,//请假说明弹出框
+      situation:"",//情况说明
+      courseDate:"",//请假后上课的日期
       pageNo: 1,
       total: 0,
       clash: [
@@ -309,6 +336,10 @@ export default {
           }
         }
       })
+    },
+    //请假
+    ok(){
+
     },
     reloadAll(current) {
       let data = {
