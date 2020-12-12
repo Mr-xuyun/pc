@@ -405,9 +405,9 @@ export default {
       this.selectedRowKeys = selectedRowKeys
     },
     changeTeacher(obj) {
-      let res =  JSON.parse(obj)
-      this.teacherName = res.label
-      this.teacherId = res.value
+      let obj1 = JSON.parse(obj);
+      this.teacherName = obj1.label
+      this.teacherId = obj1.value
     },
     submit() {
       if (
@@ -438,7 +438,7 @@ export default {
       for (let time of this.timeList) {
         timeRange += time.start.format('HH:mm') + ' - ' + time.end.format('HH:mm') + ','
       }
-      data.timeRange = timeRange.substr(0, timeRange.length - 1)
+      data.timeRange = timeRange.substr(0, timeRange.length - 1);
       this.axios.post('pc/teacherInfo/saveTeacherInfo', data).then((res) => {
         if (res.success && res.result) {
           this.$message.info(res.message)
@@ -461,7 +461,7 @@ export default {
           if (res.result.records.length != 0) {
             this.data = res.result.records
             this.total = res.result.total
-          } 
+          }
         }
         this.spinning = false
       })
@@ -508,6 +508,11 @@ export default {
 
 .add tr {
   height: 60px;
+}
+
+::v-deep .ant-pagination {
+  text-align: right;
+  margin-top: 10px;
 }
 </style>
 <style>

@@ -484,7 +484,7 @@ export default {
             this.pageNo = res.result.current
             this.total = res.result.total
           }else{
-              this.$message.info('暂无数据');
+           
           }
         }
         this.spinning = false

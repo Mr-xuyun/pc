@@ -228,7 +228,7 @@
       ok-text="确认"
       cancel-text="取消">
       <label>休眠天数</label>
-      <a-input-number style="width: 70%" v-model="sleepDays" :min="14" :default-value="3" ></a-input-number>
+      <a-input-number style="width: 70%" v-model="sleepDays" :min="7" :default-value="7" ></a-input-number>
     </a-modal>
 
   </div>

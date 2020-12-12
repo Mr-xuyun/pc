@@ -84,7 +84,10 @@
         <!-- 发布突发排课 -->
         <a-button type="primary" @click="submit" style="width: 98%; margin-top: 50px">发布</a-button>
       </a-drawer>
-      <a-button @click="$router.push('/arrangeCourse/history')"> <a-icon type="history" />历史记录</a-button>
+      <div>
+        <a-button style="margin-right: 15px" @click="$router.push('/arrangeCourse/rest')"> <a-icon type="history" />异动记录</a-button>
+        <a-button @click="$router.push('/arrangeCourse/history')"> <a-icon type="history" />历史记录</a-button>
+      </div>
     </div>
     <a-spin :spinning="spinning">
       <a-table :columns="columns" :data-source="data" rowKey="id" bordered :pagination="false">
@@ -124,7 +127,7 @@
             >
               <a-icon type="file" />保存
             </a-button>
-            <a-button type="primary" @click="id=record.id;courseDate=record.courseDate;showModal=true" class="btn"> <a-icon type="file" />请假说明</a-button>
+            <a-button type="primary" @click="rest(record)" class="btn"> <a-icon type="file" />请假</a-button>
           </div>
         </a>
       </a-table>
@@ -137,15 +140,16 @@
         title="请假"
         ok-text="确认"
         cancel-text="取消">
-        <div style="margin-bottom: 15px">情况说明:</div>
-        <a-textarea style="margin-bottom: 15px" v-model="situation" placeholder="请输入情况说明" :rows="4" />
-        <div style="margin-bottom: 15px">上课日期:</div>
-        <a-date-picker
-          v-model="courseDate"
-          format="YYYY-MM-DD"
-        >
-        </a-date-picker>
+        <a-form-model :model="formData" :label-col="labelCol" :wrapper-col="wrapperCol" :rules="formRules" ref="formData">
+          <a-form-model-item  prop="situation" label="情况说明">
+            <a-textarea style="margin-bottom: 15px" v-model="formData.situation" placeholder="请输入情况说明" :rows="4" />
+          </a-form-model-item>
+          <a-form-model-item  prop="courseDate" label="上课日期">
+            <a-date-picker v-model="formData.courseDate" format="YYYY-MM-DD"></a-date-picker>
+          </a-form-model-item>
+        </a-form-model>
       </a-modal>
+
     </a-spin>
     <a-pagination
       :default-current="1"
@@ -227,7 +231,6 @@ export default {
       ],
       data: [],
       // 突发排课
-      id:"",
       visible: false, //突发弹出框
       newBirth: false, //滑块是否是新生
       student: undefined, //学生
@@ -238,8 +241,24 @@ export default {
       endTime: undefined, //结束时间
       conflictShow: false, //冲突的按钮
       showModal:false,//请假说明弹出框
-      situation:"",//情况说明
-      courseDate:"",//请假后上课的日期
+      //请假表单
+      formData: {
+        id:"",
+        situation: '',
+        courseDate: null,
+      },
+      //请假表单验证
+      formRules:{
+        situation:[
+          { required: true, message: '不能为空', trigger: 'blur' },
+          { max: 15, message: '长度最长不能超过10', trigger: 'blur'}
+        ],
+        courseDate: [
+          { required: true, message: '不能为空', trigger: 'change' },
+        ]
+      },
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 },
       pageNo: 1,
       total: 0,
       clash: [
@@ -337,15 +356,45 @@ export default {
         }
       })
     },
+    //请假弹窗
+    rest(record){
+      this.formData.id=record.id
+      this.formData.courseDate=null;
+      this.formData.restDate=moment(record.courseDate).format('YYYY-MM-DD');
+      this.showModal=true
+    },
     //请假
     ok(){
-
+      this.$refs.formData.validate(valid => {
+        if (valid) {
+          let formData = this.formData;
+          let data = {
+            id:formData.id,
+            courseDate:moment(formData.courseDate).format("YYYY-MM-DD"),
+            situation:formData.situation,
+            restDate:formData.restDate
+          }
+          this.axios.post('pc/coursePlan/updateById', data).then((res) => {
+            if (res.success && res.result) {
+              this.reloadAll(1)
+              this.$message.info(res.message)
+              this.showModal=false;
+            } else {
+              this.$message.error('保存失败')
+            }
+          })
+        } else {
+          this.$message.error('以上内容不能为空!');
+          return false;
+        }
+      });
     },
     reloadAll(current) {
       let data = {
         pageNo: current,
         pageSize: 10,
         isNotNull: true,
+        courseDate: moment(new Date()).add(1,'days').format("YYYY-MM-DD"),
       }
       this.spinning = true
       this.axios.post('pc/coursePlan/listByPage', data).then((res) => {
@@ -360,7 +409,7 @@ export default {
               this.pageNo = res.result.current
               this.total = res.result.total
             }else{
-                 this.$message.info("暂无数据")
+              
             }
         }
          this.spinning = false

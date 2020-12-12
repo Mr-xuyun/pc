@@ -32,30 +32,48 @@
             :enlarge="option.enlarge"
             :mode="option.mode"
             :limitMinSize="option.limitMinSize"
-          ></vueCropper>
+          >
+        </vueCropper>
+          
         </div>
         <div class="test-button">
-          <button @click="changeImg" class="btn">changeImg</button>
-          <label class="btn" for="uploads">upload</label>
-          <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/gif, image/jpg" @change="uploadImg($event, 1)" ref="uploadImg">
-          <button @click="startCrop" v-if="!crap" class="btn">start</button>
-          <button @click="stopCrop" v-else class="btn">stop</button>
-          <button @click="clearCrop" class="btn">clear</button>
-          <button @click="refreshCrop" class="btn">refresh</button>
-          <button @click="changeScale(1)" class="btn">+</button>
-          <button @click="changeScale(-1)" class="btn">-</button>
-          <button @click="rotateLeft" class="btn">rotateLeft</button>
-          <button @click="rotateRight" class="btn">rotateRight</button>
-          <button @click="finish('base64')" class="btn">preview(base64)</button>
-          <button @click="finish('blob')" class="btn">preview(blob)</button>
-          <button @click="() => option.img = ''" class="btn">清除图片</button>
-          <a @click="down('base64')" class="btn">download(base64)</a>
-          <a @click="down('blob')" class="btn">download(blob)</a>
+           <!-- 上传按钮 -->
+          <!-- <label class="btn" for="uploads">upload</label>
+          <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/gif, image/jpg" @change="uploadImg($event, 1)" ref="uploadImg"> -->
+
+          <!-- 可以截图按钮  stop start -->
+          <!-- <button @click="startCrop" v-if="!crap" class="btn">start</button>
+          <button @click="stopCrop" v-else class="btn">stop</button> -->
+
+        
+          <!-- 刷新的意思 -->
+          <!-- <button @click="refreshCrop" class="btn">refresh</button> -->
+          <!-- 放大或缩小 -->
+          <!-- <button @click="changeScale(1)" class="btn">+</button>
+          <button @click="changeScale(-1)" class="btn">-</button> -->
+          <div v-if=" previews.h!=0 && previews.w!=0" >
+                  <button @click="down('base64')"  class="btn" >添加截图</button>
+              </div>
+
+           <div></div>
+          <div >
+         		<button @click="clearCrop" class="btn">清除</button>
+             <button @click="rotateLeft" class="btn">旋转</button>
+          </div>
+          <!-- <button @click="rotateRight" class="btn">rotateRight</button> -->
+            <!-- 图片的预览 -->
+          <!-- <button @click="finish('base64')" class="btn">preview(base64)</button>
+          <button @click="finish('blob')" class="btn">preview(blob)</button> -->
+
+          <!-- <button @click="() => option.img = ''" class="btn">清除图片</button> -->
+          <!-- 下载 -->
+          <!-- <a @click="down('base64')" class="btn">download(base64)</a>
+          <a @click="down('blob')" class="btn">download(blob)</a> -->
           <a :href="downImg" download="demo.png" ref="downloadDom"></a>
         </div>
 
         <div class="pre">
-          <section class="pre-item">
+          <!-- <section class="pre-item">
             <p>截图框大小</p>
             <div class="show-preview" :style="{'width': previews.w + 'px', 'height': previews.h + 'px',  'overflow': 'hidden',
 							'margin': '5px'}">
@@ -63,47 +81,74 @@
                 <img :src="previews.url" :style="previews.img">
               </div>
             </div>
-          </section>
+               <div v-if=" previews.h!=0 && previews.w!=0" ><a-button> 确定</a-button></div>
+          </section> -->
+            
 
-          <section class="pre-item">
+          <!-- <section class="pre-item">
             <p>中等大小</p>
             <div :style="previewStyle1">
               <div :style="previews.div">
                 <img :src="previews.url" :style="previews.img">
               </div>
             </div>
-          </section>
-
-          <section class="pre-item">
+          </section>  -->
+         <!-- <section class="pre-item">
             <p>迷你大小</p>
             <div :style="previewStyle2">
               <div :style="previews.div">
                 <img :src="previews.url" :style="previews.img">
               </div>
             </div>
-          </section>
+          </section> -->
 
-          <section class="pre-item" title="zoom: (100 / previews.w)">
+          <!-- <section class="pre-item" title="zoom: (100 / previews.w)">
             <p>固定为100宽度</p>
             <div :style="previewStyle3">
               <div :style="previews.div">
-                <img :src="previews.url" :style="previews.img">
+                <img :src="previews.url" :style="previews.img" width="50" height="50">
               </div>
             </div>
-          </section>
+              <div v-if=" previews.h!=0 && previews.w!=0" ><a-button> 确定</a-button></div>
+          </section> -->
+
 
           <section class="pre-item" title="zoom: (100 / previews.h)">
-            <p>固定为100高度</p>
-            <div :style="previewStyle4">
+            <!-- <p>固定为100高度</p>
+            <div :style="previewStyle4" >
               <div :style="previews.div">
                 <img :src="previews.url" :style="previews.img">
               </div>
             </div>
+              <div v-if=" previews.h!=0 && previews.w!=0" >
+                  <a-button> 确定</a-button>
+              </div> -->
+                 <!-- <img :src="previews.url" :style="previews.img" width="50" height="50" > -->
+             <div v-if=" previews.h!=0 && previews.w!=0">
+                   
+                
+             </div>
           </section>
+           
         </div>
-
+          <!-- <div style="display:flex; "  >
+               <div  v-for="(image,i) of  imgList"  :key="i"   >
+                  <a-card hoverable style="width: 150px; margin-left:10px; margin-top:15px; "   >
+                  <img
+                    slot="cover"
+                    alt="example"
+                    width="150" height="150"
+                    :src="image"  
+                  />
+                       <div style="display: flex;  justify-content:space-evenly; ">
+                         	<a-button  size="small" >＋疑难库</a-button>
+                       <a-button  type="primary" size="small" style="margin-left:10px;" >＋错题库</a-button>
+                       </div>
+                </a-card>
+               </div>
+            </div> -->
         <div style="display:block; width: 100%;">
-          <label class="c-item">
+          <!-- <label class="c-item">
             <span>图片默认渲染方式</span>
             <select v-model="option.mode">
               <option value="contain">contain</option>
@@ -116,71 +161,71 @@
             <section>
               类似css background属性设置  设置不符合规范不生效， 参照文档说明
             </section>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>上传时图片最大大小(默认会压缩尺寸到这个大小)</span>
             <input type="nubmer" v-model="option.maxImgSize">
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>上传图片是否显示原始宽高 (针对大图 可以铺满)</span>
             <input type="checkbox" v-model="option.original">
             <span>original: {{ option.original}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>是否根据dpr生成适合屏幕的高清图片</span>
             <input type="checkbox" v-model="option.high">
             <span>high: {{ option.high}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>是否输出原图比例的截图</span>
             <input type="checkbox" v-model="option.full">
             <span>full: {{ option.full}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>截图信息展示是否是真实的输出宽高</span>
             <input type="checkbox" v-model="option.infoTrue">
             <span>infoTrue: {{ option.infoTrue}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>能否拖动图片</span>
             <input type="checkbox" v-model="option.canMove">
             <span>canMove: {{ option.canMove}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>能否拖动截图框</span>
             <input type="checkbox" v-model="option.canMoveBox">
             <span>canMoveBox: {{ option.canMoveBox}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>截图框固定大小</span>
             <input type="checkbox" v-model="option.fixedBox">
             <span>fixedBox: {{ option.fixedBox}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>是否自动生成截图框</span>
             <input type="checkbox" v-model="option.autoCrop">
             <span>autoCrop: {{ option.autoCrop}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>自动生成截图框的宽高</span>
             <span>宽度:  </span><input type="number" v-model="option.autoCropWidth">
             <span>高度:  </span><input type="number" v-model="option.autoCropHeight">
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>截图框是否限制在图片里(只有在自动生成截图框时才能生效)</span>
             <input type="checkbox" v-model="option.centerBox">
             <span>centerBox: {{ option.centerBox}}</span>
-          </label>
-          <label class="c-item">
+          </label> -->
+          <!-- <label class="c-item">
             <span>是否按照截图框比例输出 默认为1 </span>
             <input type="number" v-model="option.enlarge">
-          </label>
-          <p>输出图片格式</p>
+          </label> -->
+          <!-- <p>输出图片格式</p>
           <label class="c-item">
             <label>jpg  <input type="radio" name="type" value="jpeg" v-model="option.outputType"></label>
             <label>png  <input type="radio" name="type" value="png" v-model="option.outputType"></label>
             <label>webp <input type="radio" name="type" value="webp" v-model="option.outputType"></label>
-          </label>
+          </label> -->
         </div>
       </div>
     </div>
@@ -191,6 +236,12 @@
   import { VueCropper } from 'vue-cropper'
 
   export default {
+    props: {
+    imgs: {
+      type: String,
+      default: 'hello world'
+    }
+  },
     name: 'ImagCropper',
     components: {
       VueCropper
@@ -215,20 +266,20 @@
           size: 1,
           full: false,
           outputType: "png",
-          canMove: true,
+          canMove: false,
           fixedBox: false,
           original: false,
           canMoveBox: true,
-          autoCrop: true,
+          autoCrop: false, //是否自动生成截图框
           // 只有自动截图开启 宽度高度才生效
           autoCropWidth: 200,
           autoCropHeight: 150,
-          centerBox: false,
+          centerBox: true,
           high: false,
           cropData: {},
-          enlarge: 1,
-          mode: 'contain',
-          maxImgSize: 3000,
+          enlarge: 1,//是否按照截图框比例输出 默认为1
+          mode: 'contain', //图片默认渲染方式
+          maxImgSize: 3000,//上传时图片最大大小
           limitMinSize: [100, 120]
         },
         example2: {
@@ -263,12 +314,11 @@
         code2: '',
         code3: '',
         preview3: '',
+        isImg :false,
+        imgList:[],
       };
     },
     methods: {
-      changeImg() {
-        this.option.img = this.lists[~~(Math.random() * this.lists.length)].img;
-      },
       startCrop() {
         // start
         this.crap = true;
@@ -286,6 +336,7 @@
       refreshCrop() {
         // clear
         this.$refs.cropper.refresh();
+        
       },
       changeScale(num) {
         num = num || 1;
@@ -313,10 +364,10 @@
       },
       // 实时预览函数
       realTime(data) {
+          
         var previews = data;
         var h = 0.5;
         var w = 0.2;
-
         this.previewStyle1 = {
           width: previews.w + "px",
           height: previews.h + "px",
@@ -338,7 +389,7 @@
           height: previews.h + "px",
           overflow: "hidden",
           margin: "0",
-          zoom: (100 / previews.w)
+          zoom: (150 / previews.w),
         };
 
         this.previewStyle4 = {
@@ -346,10 +397,11 @@
           height: previews.h + "px",
           overflow: "hidden",
           margin: "0",
-          zoom: (100 / previews.h)
+          zoom: (300 / (previews.h + previews.w) )
         };
-
+       
         this.previews = data;
+        
       },
 
       finish2(type) {
@@ -365,6 +417,7 @@
         });
       },
       down(type) {
+        
         // 输出
         if (type === "blob") {
           this.$refs.cropper.getCropBlob(data => {
@@ -381,14 +434,16 @@
         } else {
           this.$refs.cropper.getCropData(data => {
             this.downImg = data;
-            if (window.navigator.msSaveBlob) {
-              var blobObject = new Blob([data]);
-              window.navigator.msSaveBlob(blobObject, "demo.png");
-            } else {
-              this.$nextTick(() => {
-                this.$refs.downloadDom.click();
-              });
-            }
+            //  this.imgList.push(data)
+              this.$emit("onImg",data)
+            // if (window.navigator.msSaveBlob) {
+            //   var blobObject = new Blob([data]);
+            //   window.navigator.msSaveBlob(blobObject, "demo.png");
+            // } else {
+            //   this.$nextTick(() => {
+            //     this.$refs.downloadDom.click();
+            //   });
+            // }
           });
         }
       },
@@ -432,12 +487,19 @@
       VueCropper
     },
     mounted() {
-      this.changeImg();
-      var list = [].slice.call(document.querySelectorAll("pre code"));
-      list.forEach((val, index) => {
-        hljs.highlightBlock(val);
-      });
-    }
+      // this.changeImg();
+      // var list = [].slice.call(document.querySelectorAll("pre code"));
+      // list.forEach((val, index) => {
+      //   hljs.highlightBlock(val);
+      // });
+      // stop 可以截图
+      this.crap = true;
+      this.$refs.cropper.startCrop(); 
+       //把图片赋值给子组件  
+      this.$set(this.option,"img" , this.imgs)
+      console.log(this.imgs);
+    },
+   
   };
 </script>
 
@@ -456,6 +518,7 @@
   .test-button {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
   }
 
   .btn {

@@ -12,7 +12,7 @@
     </div>
     <!--  表格的内容 -->
        <a-spin :spinning="spinning">
-    <a-table :columns="columns" :data-source="data" bordered :pagination="false" rowKey="index">
+    <a-table :columns="columns" :data-source="data" bordered :pagination="false" rowKey="id">
       <!-- 操作的页面 -->
       <span slot="action" slot-scope="text, record">
         <div style="display: flex">
@@ -35,7 +35,7 @@
           :default-value="moment(record.courseDate,'YYYY-MM-DD')"
           :disabled="record.showUpdate"
           v-model="record.courseDate"
-          
+
           format="YYYY-MM-DD" />
       </a>
 
@@ -159,7 +159,7 @@ export default {
            this.pageSize =size
           this.reloadAll(current)
     },
-    //重置按钮 
+    //重置按钮
     resetBtn(){
         if(this.studentName!=undefined || this.courseDate!=""){
             this.studentName =undefined ,
@@ -223,7 +223,7 @@ export default {
         this.teacherList = res.result
       })
     },
-    reloadAll(current,pageSize) {
+    reloadAll() {
       let data = {
         pageNo: this.pageNo,
         pageSize: this.pageSize,
@@ -233,23 +233,19 @@ export default {
       }
       this.spinning=true;
       this.axios.post('pc/coursePlan/listByPage', data).then((res) => {
-        console.log(res);
            if(res.success){
                if(res.result.records.length!=0){
                   this.pageNo = res.result.current
                   this.total = res.result.total
                     this.data = []
                 let items = res.result.records
-                      items.forEach((item,i)=>{
-                        item.showUpdate = true
-                        item.subjectList = item.subjectList.split(',')
-                        item.index = i
-                        this.data.push(item)
-                      }) 
-                 
-                  
+                    for (let item of items) {
+                    item.showUpdate = true
+                    item.subjectList = item.subjectList.split(',')
+                    this.data.push(item)
+                  }
                }else{
-                  this.$message.info('暂无数据');
+                 
                }
            }
            this.spinning=false

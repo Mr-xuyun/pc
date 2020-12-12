@@ -19,6 +19,11 @@ export default {
       type: Array,
       required: true,
       default: () => []
+    },
+    mouseLeft:{
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {
@@ -38,8 +43,14 @@ export default {
     }
   },
   created () {
-    window.addEventListener('mousedown', e => this.closeMenu(e))
-    window.addEventListener('contextmenu', e => this.setPosition(e))
+    console.log(this.mouseLeft)
+    if (this.mouseLeft){
+      window.addEventListener('mouseup', e => this.setPosition(e))
+      window.addEventListener('contextmenu', e => this.closeMenu(e))
+    }else{
+      window.addEventListener('mousedown', e => this.closeMenu(e))
+      window.addEventListener('contextmenu', e => this.setPosition(e))
+    }
   },
   methods: {
     closeMenu (e) {
